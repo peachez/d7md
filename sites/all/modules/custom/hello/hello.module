@@ -1,2 +1,41 @@
 <?php
 
+function hello_block_info() {
+  $blocks = [
+    'hello_world' => [
+      'info' => t('Hello World Block'),
+    ],
+    'hello_user' => [
+      'info' => t('Hello User Block'),
+    ],
+  ];
+
+  return $blocks;
+}
+
+function hello_block_view($delta = '') {
+  $block = [];
+
+  switch ($delta) {
+    case 'hello_world':
+      $block['subject'] = t('Hello World!!!');
+      $block['content'] = t('This is the hello world block.');
+      break;
+
+    case 'hello_user':
+      $hour = date('G');
+      $greeting = 'Good Evening @name!';
+      if ($hour < 12) {
+        $greeting = 'Good Morning @name!';
+      }
+      elseif ($hour < 18) {
+        $greeting = 'Good Afternoon @name!';
+      }
+
+      $block['subject'] = t('Hello World');
+      $block['content'] = t($greeting, ['@name' => $GLOBALS['user']->name]);
+      break;
+  }
+
+  return $block;
+}
