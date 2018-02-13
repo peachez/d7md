@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implements hook_block_info()
+ */
 function hello_block_info() {
   $blocks = [
     'hello_world' => [
@@ -8,11 +11,17 @@ function hello_block_info() {
     'hello_user' => [
       'info' => t('Hello User Block'),
     ],
+    'user_info' => [
+      'info' => t('User Info Block'),
+    ],
   ];
 
   return $blocks;
 }
 
+/**
+ * Implements hook_block_view()
+ */
 function hello_block_view($delta = '') {
   $block = [];
 
@@ -34,6 +43,30 @@ function hello_block_view($delta = '') {
 
       $block['subject'] = t('Hello World');
       $block['content'] = t($greeting, ['@name' => $GLOBALS['user']->name]);
+      break;
+
+    case 'user_info':
+      if (arg(0) == 'user' && is_numeric(arg(1))) {
+        $this_user = user_load(arg(1));
+        if (!empty($this_user)) {
+          $block['subject'] = t('User Info');
+
+          // Common label value theme func.
+          $theme_item = function($label, $value) {
+            return '<div><label>' . t($label) . '</label>' . $value . '</div>';
+          };
+
+          $output = '';
+          $output .= $theme_item('Name', $this_user->name);
+          $output .= $theme_item('Email', $this_user->mail);
+          $output .= $theme_item('Created', date('m/d/Y g:ia', $this_user->created));
+
+          $access = ($this_user->access == 0) ? 'Never' : date('m/d/Y g:ia', $this_user->access);
+          $output .= $theme_item('Last Accessed', $access);
+
+          $block['content'] = $output;
+        }
+      }
       break;
   }
 
