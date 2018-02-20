@@ -22,6 +22,16 @@ function hello_menu_menu() {
     'weight' => 2,
   ];
 
+  $items['variables/%'] = [
+    'title callback' => 'hello_menu_show_variable_title',
+    'title arguments' => [1],
+    'page callback' => 'hello_menu_show_variable',
+    'page arguments' => [1],
+    'access arguments' => ['access content'],
+    'menu_name' => 'main-menu',
+    'weight' => 3,
+  ];
+
   return $items;
 }
 
@@ -35,9 +45,20 @@ function hello_menu_list_variables() {
   $output = '<ul>';
 
   foreach ($names as $name) {
-    $output .= '<li>' . $name . '</li>';
+    $output .= '<li>' . l($name, '/variables/' . $name, [
+      'attributes' => ['target' => '_blank'],
+    ]) . '</li>';
   }
 
   $output .= '</ul>';
   return $output;
+}
+
+function hello_menu_show_variable($name) {
+  $var = variable_get($name, t('No Value Found'));
+  return kpr($var, TRUE);
+}
+
+function hello_menu_show_variable_title($name) {
+  return t('System Variable: @name', ['@name' => $name]);
 }
