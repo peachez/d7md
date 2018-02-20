@@ -1,0 +1,5 @@
+name = Hello Menu Router
+description = Hello Menu Router examples for DrupalTutor Module Development Class.
+core = 7.x
+package = DrupalTutor
+version = 7.x-1.0

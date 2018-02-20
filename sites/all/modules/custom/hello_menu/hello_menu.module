@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Implements hook_menu()
+ */
+function hello_menu_menu() {
+  $items = [];
+
+  $items['hello'] = [
+    'title' => 'Hello World',
+    'page callback' => 'hello_menu_simple_hello',
+    'access arguments' => ['access content'],
+    'menu_name' => 'main-menu',
+    'weight' => 1,
+  ];
+
+  return $items;
+}
+
+function hello_menu_simple_hello() {
+
+  return t('hello world simple');
+}
