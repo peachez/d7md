@@ -1,5 +1,5 @@
-name = Hellow World
-description = Hellow World examples for DrupalTutor Module Development Class.
+name = Hello World
+description = Hello World examples for DrupalTutor Module Development Class.
 core = 7.x
 package = DrupalTutor
 version = 7.x-1.0
