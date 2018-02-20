@@ -14,10 +14,30 @@ function hello_menu_menu() {
     'weight' => 1,
   ];
 
+  $items['variables'] = [
+    'title' => 'System Variables',
+    'page callback' => 'hello_menu_list_variables',
+    'access arguments' => ['access content'],
+    'menu_name' => 'main-menu',
+    'weight' => 2,
+  ];
+
   return $items;
 }
 
 function hello_menu_simple_hello() {
-
   return t('hello world simple');
+}
+
+function hello_menu_list_variables() {
+  $vars = variable_initialize();
+  $names = array_keys($vars);
+  $output = '<ul>';
+
+  foreach ($names as $name) {
+    $output .= '<li>' . $name . '</li>';
+  }
+
+  $output .= '</ul>';
+  return $output;
 }
