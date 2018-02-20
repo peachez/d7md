@@ -8,6 +8,7 @@ function hello_menu_menu() {
 
   $items['hello'] = [
     'title' => 'Hello World',
+    'description' => 'This is where we say hello',
     'page callback' => 'hello_menu_simple_hello',
     'access arguments' => ['access content'],
     'menu_name' => 'main-menu',
@@ -28,21 +29,36 @@ function hello_menu_menu() {
     'type' => MENU_LOCAL_TASK,
   ];
 
+  $items['hello/variables/list'] = [
+    'title' => 'System Variables',
+    'weight' => 0,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  ];
+
+  $items['hello/variables/create'] = [
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Create Variable',
+    'page callback' => 'hello_menu_create_variable',
+    'access arguments' => ['access content'],
+    'weight' => 1,
+  ];
+
+  $items['hello/variables/delete'] = [
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Delete Variable',
+    'page callback' => 'hello_menu_delete_variable',
+    'access arguments' => ['access content'],
+    'weight' => 2,
+  ];
+
   $items['hello/variables/%'] = [
+    'type' => MENU_CALLBACK,
     'title callback' => 'hello_menu_show_variable_title',
     'title arguments' => [2],
     'page callback' => 'hello_menu_show_variable',
     'page arguments' => [2],
     'access arguments' => ['access content'],
     'weight' => 3,
-  ];
-
-  $items['hello/variables/create'] = [
-    'type' => MENU_LOCAL_ACTION,
-    'title' => 'Create Variable',
-    'page callback' => 'hello_menu_create_variable',
-    'access arguments' => ['access content'],
-    // 'weight' => 3,
   ];
 
   return $items;
@@ -78,4 +94,8 @@ function hello_menu_show_variable_title($name) {
 
 function hello_menu_create_variable() {
   return 'This is where we create variables';
+}
+
+function hello_menu_delete_variable() {
+  return 'This is where we delete variables';
 }
