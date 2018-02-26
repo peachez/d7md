@@ -1,0 +1,58 @@
+<?php
+
+define('NODE_LIMIT_EDIT_TIME', 15); // minutes
+
+function node_limit_menu() {
+  $items = [];
+
+  $items['node/%node/edit-locked'] = [
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Updates Locked',
+    'page callback' => 'node_limit_locked_edit_page',
+    'access callback' => 'node_limit_node_locked_access',
+    'access arguments' => [1],
+    'weight' => -1
+  ];
+
+  return $items;
+}
+
+function node_limit_menu_alter(&$items) {
+  $items['node/%node/edit']['title callback'] = 'node_limit_node_edit_title';
+  $items['node/%node/edit']['title arguments'] = [1];
+  $items['node/%node/edit']['weight'] = -1;
+  $items['node/%node/edit']['access callback'] = 'node_limit_node_update_access';
+}
+
+function node_limit_node_locked_access($node) {
+  if (is_within_edit_time($node)) { return FALSE; }
+  return node_access('update', $node);
+}
+
+function node_limit_node_update_access($op, $node, $account = NULL) {
+  if (is_within_edit_time($node)) {
+    return node_access($op, $node, $account);
+  }
+  return FALSE;
+}
+
+function node_limit_node_edit_title($node) {
+  $time_left = node_limit_get_time_remaining($node);
+  $mins = intval($time_left/60);
+  $secs = $time_left % 60;
+
+  return 'Update (' . $mins . ':' . $secs . ' remaining)';
+}
+
+function node_limit_locked_edit_page() {
+  return t('This node is locked.');
+}
+
+function is_within_edit_time($node) {
+  return ($node->changed > (REQUEST_TIME - (NODE_LIMIT_EDIT_TIME*60)));
+}
+
+function node_limit_get_time_remaining($node) {
+  $time_diff = (REQUEST_TIME - $node->changed);
+  return (NODE_LIMIT_EDIT_TIME*60) - $time_diff;
+}

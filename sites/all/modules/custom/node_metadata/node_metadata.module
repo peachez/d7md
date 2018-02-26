@@ -1,0 +1,25 @@
+<?php
+
+function node_metadata_menu() {
+  $items = [];
+
+  $items['node/%node/metadata'] = [
+    'title' => 'Metadata',
+    'page callback' => 'node_metadata_page',
+    'page arguments' => [1],
+    'access arguments' => ['view node metadata'],
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'node_metadata.pages.inc',
+  ];
+
+  return $items;
+}
+
+function node_metadata_permission() {
+  return [
+    'view node metadata' => [
+      'title' => 'View Metadata about Node',
+      'description' => 'View important details about the node.',
+    ],
+  ];
+}
