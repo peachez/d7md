@@ -1,0 +1,36 @@
+<?php
+
+function personnel_menu() {
+  $items = [];
+
+  $items['personnel'] = [
+    'title' => 'Personnel',
+    'page callback' => 'personnel_list_page',
+    'access arguments' => ['access content'],
+  ];
+
+  return $items;
+}
+
+function personnel_list_page() {
+  db_set_active('test');
+  $results = db_query('SELECT p.*, d.name AS department_name FROM {personnel} p
+                       LEFT JOIN {department_members} dm ON p.id = dm.personnel_id
+                       LEFT JOIN {department} d ON dm.department_id = d.id
+                       ORDER BY p.lname, p.fname');
+
+  $rows = [];
+  foreach ($results as $record) {
+    $rows[] = [
+      $record->fname,
+      $record->lname,
+      $record->department_name,
+    ];
+  }
+  db_set_active('default');
+
+  return theme('table', [
+    'header' => [t('First Name'), t('Last Name'), t('Department')],
+    'rows' => $rows,
+  ]);
+}

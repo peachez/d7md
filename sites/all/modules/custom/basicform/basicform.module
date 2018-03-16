@@ -1,0 +1,65 @@
+<?php
+
+function basicform_menu() {
+  $items = [];
+
+  $items['basicform'] = [
+    'title' => 'Basic Form Example',
+    'page callback' => 'basicform_example_page',
+    'access arguments' => ['access content'],
+  ];
+
+  return $items;
+}
+
+function basicform_example_page() {
+  $form = drupal_get_form('basicform_example_form');
+  $output = drupal_render($form);
+  return $output;
+}
+
+function basicform_example_form($form, &$form_state) {
+  $form['name'] = [
+    '#title' => 'Name',
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  ];
+
+  $form['email'] = [
+    '#title' => 'Email',
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  ];
+
+  $form['phone'] = [
+    '#title' => 'Phone',
+    '#type' => 'textfield',
+  ];
+
+  $form['message'] = [
+    '#title' => 'Message',
+    '#type' => 'textarea',
+  ];
+
+  $form['send'] = [
+    '#value' => 'Send Feedback',
+    '#type' => 'submit',
+  ];
+
+  return $form;
+}
+
+function basicform_example_form_validate($form, &$form_state) {
+  $ph = preg_replace('/[^0-9]/', '', $form_state['values']['phone']);
+  if (strlen($ph) < 10) {
+    form_set_error('phone', 'You must supply a valid phone number XXX-XXX-XXXX');
+  }
+
+  if (!valid_email_address($form_state['values']['email'])) {
+    form_set_error('email', 'You must supply a valid email address.');
+  }
+}
+
+function basicform_example_form_submit($form, &$form_state) {
+  dpm($form_state['values']);
+}

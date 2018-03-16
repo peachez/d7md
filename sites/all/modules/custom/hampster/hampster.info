@@ -1,0 +1,7 @@
+name = Hampster DB
+description = An example of how to work with databases in Drupal.
+core = 7.x
+package = DrupalTutor
+version = 7.x-1.0
+
+dependencies[] = views

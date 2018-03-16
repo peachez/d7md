@@ -1,0 +1,231 @@
+<?php
+
+function hampster_menu() {
+  $items = [];
+
+  $items['hampsters'] = [
+    'title' => 'Hampsters',
+    'page callback' => 'hampsters_list_page',
+    'access arguments' => ['view hampster'],
+    'file' => 'hampster.pages.inc',
+  ];
+
+  $items['hampsters/%hampster'] = [
+    'title callback' => 'hampsters_hampster_title',
+    'title arguments' => [1],
+    'page callback' => 'hampsters_hampster_page',
+    'page arguments' => [1],
+    'access arguments' => ['view hampster'],
+    'file' => 'hampster.pages.inc',
+  ];
+
+  $items['hampsters/%hampster/view'] = [
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  ];
+
+  $items['hampsters/%hampster/edit'] = [
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['hampster_edit_form', 1],
+    'access arguments' => ['edit hampster'],
+    'file' => 'hampster.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  ];
+
+  $items['hampsters/%hampster/delete'] = [
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['hampster_delete_form', 1],
+    'access arguments' => ['edit hampster'],
+    'file' => 'hampster.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  ];
+
+  $items['hampsters/add'] = [
+    'title' => 'Add Hampster',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['hampster_edit_form'],
+    'access arguments' => ['edit hampster'],
+    'file' => 'hampster.pages.inc',
+    'type' => MENU_LOCAL_ACTION,
+  ];
+
+  /*
+
+  $items['hampsters/insert'] = [
+    'title' => 'DB Insert',
+    'page callback' => 'hampsters_insert',
+    'access arguments' => ['edit hampster'],
+  ];
+
+  $items['hampsters-oo'] = [
+    'title' => 'Hampsters',
+    'page callback' => 'hampsters_oo_list_page',
+    'access arguments' => ['view hampster'],
+    'file' => 'hampster.pages.inc',
+  ];
+
+  $items['hampsters-oo/%'] = [
+    'title' => 'Hampsters',
+    'page callback' => 'hampsters_oo_list_page',
+    'page arguments' => [1],
+    'access arguments' => ['view hampster'],
+    'file' => 'hampster.pages.inc',
+  ];
+
+  $items['hampsters-oo/insert'] = [
+    'title' => 'DB Insert',
+    'page callback' => 'hampsters_oo_insert',
+    'access arguments' => ['edit hampster'],
+  ];
+
+  $items['hampsters-oo/update'] = [
+    'title' => 'DB Update',
+    'page callback' => 'hampsters_oo_update',
+    'access arguments' => ['edit hampster'],
+  ];
+
+  $items['hampsters-oo/delete'] = [
+    'title' => 'DB Delete',
+    'page callback' => 'hampsters_oo_delete',
+    'access arguments' => ['edit hampster'],
+  ];
+
+
+  $items['hampsters-write/insert'] = [
+    'title' => 'DB Insert',
+    'page callback' => 'hampsters_write_insert',
+    'access arguments' => ['edit hampster'],
+  ];
+
+  $items['hampsters-write/update'] = [
+    'title' => 'DB Update',
+    'page callback' => 'hampsters_write_update',
+    'access arguments' => ['edit hampster'],
+  ];
+*/
+  return $items;
+}
+
+function hampster_views_api() {
+  return ['api' => 3];
+}
+
+function hampster_permission() {
+  return [
+    'view hampster' => [
+      'title' => 'View Hampsters',
+      'description' => 'View info about hampsters in the database.',
+    ],
+    'edit hampster' => [
+      'title' => 'Add and Edit Hampsters',
+      'description' => 'Add and Edit hampsters in the database.',
+    ],
+  ];
+}
+
+function hampster_theme($existing, $type, $theme, $path) {
+  return [
+    'hampster_info' => [
+      'vars' => ['hampster' => NULL],
+    ],
+  ];
+}
+
+function theme_hampster_info($vars) {
+  $hampster = $vars['hampster'];
+
+  drupal_add_css(drupal_get_path('module', 'hampster') . '/hampster.css');
+
+  $theme_value = function($v, $label) {
+    return '<div><label class="inline">' . t($label) . ':</label> ' . $v . '</div>';
+  };
+
+  $output = '<div class="hampster-page">';
+
+  $output .= $theme_value($hampster->id, 'ID');
+  $output .= $theme_value($hampster->gender, 'Gender');
+  $output .= $theme_value(t('@weight g', ['@weight' => $hampster->weight]), 'Weight');
+  $output .= $theme_value($hampster->habitat_name, 'Habitat');
+
+  $output .= '</div>';
+  return $output;
+}
+
+function hampster_load($id) {
+  return db_query('SELECT h.*, hb.name AS habitat_name FROM hamsters h
+    LEFT JOIN habitats hb ON hb.id = h.habitat_id
+    WHERE h.id = :id', [':id' => $id])->fetchObject();
+}
+
+
+/*
+function hampsters_insert() {
+  $names = ['John', 'Jack', 'Bobbie', 'Susie', 'Jeff', 'Cindy'];
+  $result = db_query('INSERT INTO {hamsters} (name, gender, weight, habitat_id)
+             VALUES (:name, :gender, :weight, :habitat_id)', [
+                ':name' => $names[rand(0, 4)],
+                ':gender' => ((rand(0,1) == 0) ? 'male': 'female'),
+                ':weight' => rand(50, 200),
+                ':habitat_id' => rand(1, 3),
+             ]);
+  return 'New Hampster created!';
+}
+
+
+
+
+
+
+function hampsters_oo_insert() {
+  $fields = _hampsters_get_new_record();
+  db_insert('hamsters')
+    ->fields($fields)
+    ->execute();
+    return 'Added Hampster';
+}
+
+function hampsters_oo_update() {
+  db_update('hamsters')
+    ->fields([
+      'habitat_id' => 1,
+    ])
+    ->condition('name', 'Jack')
+    ->execute();
+    return 'Updated Hampsters';
+}
+
+function hampsters_oo_delete() {
+  db_delete('hamsters')
+    ->condition('id', 58)
+    ->execute();
+    return 'Deleted Hampster';
+}
+
+
+function hampsters_write_insert() {
+  $fields = _hampsters_get_new_record();
+  drupal_write_record('hamsters', $fields);
+  return 'Added Hampster';
+}
+
+function hampsters_write_update() {
+  $fields = _hampsters_get_new_record();
+  $fields['id'] = 1;
+  drupal_write_record('hamsters', $fields, ['id']);
+  return 'Updated Hampster';
+}
+
+function _hampsters_get_new_record() {
+  $names = ['John', 'Jack', 'Bobbie', 'Susie', 'Jeff', 'Cindy'];
+  return [
+    'name' => $names[rand(0, 4)],
+    'gender' => ((rand(0,1) == 0) ? 'male': 'female'),
+    'weight' => rand(50, 200),
+    'habitat_id' => rand(1, 3),
+  ];
+}
+*/

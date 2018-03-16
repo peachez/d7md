@@ -1,0 +1,41 @@
+<?php
+
+function agreetopost_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'article_node_form') {
+    dpm($form);
+    $form['title']['#title'] = t('Article Title');
+    $form['title']['#size'] = 100;
+
+    $form['body']['#weight'] = -2;
+    $form['field_image']['#weight'] = -3;
+    $form['field_tags']['#weight'] = -4;
+
+    $form['field_image']['#access'] = ($GLOBALS['user']->uid == 1);
+
+    if (empty($form['nid']['#value'])) {
+      $form['agreetopost'] = [
+        '#type' => 'checkbox',
+        '#title' => t('I agree to the terms and conditions of this site.'),
+        '#weight' => 100,
+      ];
+      $form['actions']['#weight'] = 101;
+      $form['#validate'][] = 'agreetopost_article_node_form_validate';
+      // $form['actions']['submit']['#submit'][] = 'agreetopost_article_node_form_submit';
+      array_unshift($form['actions']['submit']['#submit'], 'agreetopost_article_node_form_submit');
+      // $form['#submit'][] = 'agreetopost_article_node_form_submit';
+    }
+  }
+}
+
+function agreetopost_article_node_form_validate(&$form, &$form_state) {
+  if (isset($form_state['values']['agreetopost']) && empty($form_state['values']['agreetopost'])) {
+    form_set_error('agreetopost', 'You must agree to the site\'s terms and conditions before publishing.');
+  }
+}
+
+function agreetopost_article_node_form_submit(&$form, &$form_state) {
+  // $form_state['values']['title'] = 'OOOOOOOOOOOO';
+  if (isset($form_state['values']['agreetopost']) && !empty($form_state['values']['agreetopost'])) {
+    drupal_set_message('You have agreed to the site\'s terms and conditions.');
+  }
+}
