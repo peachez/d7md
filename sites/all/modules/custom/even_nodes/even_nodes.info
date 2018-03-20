@@ -1,0 +1,6 @@
+name = Even Nodes
+description = Testing views hooks.
+core = 7.x
+package = DrupalTutor
+version = 7.x-1.0
+
