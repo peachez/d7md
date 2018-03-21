@@ -32,17 +32,19 @@ function hello_block_view($delta = '') {
       break;
 
     case 'hello_user':
-      $hour = date('G');
-      $greeting = 'Good Evening @name!';
-      if ($hour < 12) {
-        $greeting = 'Good Morning @name!';
-      }
-      elseif ($hour < 18) {
-        $greeting = 'Good Afternoon @name!';
-      }
+      if (is_object($GLOBALS['user']) && $GLOBALS['user']->uid > 0) {
+        $hour = date('G');
+        $greeting = 'Good Evening @name!';
+        if ($hour < 12) {
+          $greeting = 'Good Morning @name!';
+        }
+        elseif ($hour < 18) {
+          $greeting = 'Good Afternoon @name!';
+        }
 
-      $block['subject'] = t('Hello World');
-      $block['content'] = t($greeting, ['@name' => $GLOBALS['user']->name]);
+        $block['subject'] = t('Hello World');
+        $block['content'] = t($greeting, ['@name' => $GLOBALS['user']->name]);
+      }
       break;
 
     case 'user_info':
