@@ -37,10 +37,6 @@ function perfdemo_load_all_hamsters() {
   }
 
   return $all_hams;
-  // foreach ($ids as $id) {
-  //   $ham[] = perfdemo_hamster_load($id);
-  // }
-  // return $ham;
 }
 
 function perfdemo_hamster_load($id) {
