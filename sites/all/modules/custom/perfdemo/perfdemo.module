@@ -1,0 +1,57 @@
+<?php
+
+function perfdemo_menu() {
+  $items = [];
+
+  $items['perfdemo'] = [
+    'title' => 'Performance Demo',
+    'page callback' => 'perfdemo_page',
+    'access arguments' => ['access content'],
+  ];
+
+  return $items;
+}
+
+function perfdemo_page() {
+  $start = microtime(TRUE);
+  $count = 0;
+
+  for ($i = 0; $i < 5; $i++) {
+    $count += count(perfdemo_load_all_hamsters());
+  }
+  return t('Loaded @count hamsters in @time seconds.', [
+    '@count' => $count,
+    '@time' => (microtime(TRUE) - $start),
+  ]);
+}
+
+function perfdemo_load_all_hamsters() {
+  $ham_list_cache = cache_get('perfdemo:ham:list');
+  if (!empty($ham_list_cache)) {
+    $all_hams = $ham_list_cache->data;
+  }
+  else {
+    $ids = db_query('SELECT id FROM {hamsters}')->fetchCol();
+    $all_hams = array_map('perfdemo_hamster_load', $ids);
+    cache_set('perfdemo:ham:list', $all_hams);
+  }
+
+  return $all_hams;
+  // foreach ($ids as $id) {
+  //   $ham[] = perfdemo_hamster_load($id);
+  // }
+  // return $ham;
+}
+
+function perfdemo_hamster_load($id) {
+  $ham = &drupal_static(__FUNCTION__, []);
+
+  if (!isset($ham[$id])) {
+    usleep(100000);
+    $ham[$id] = db_query('SELECT h.*, hh.name as habitat_name FROM {hamsters} h
+                         LEFT JOIN {habitats} hh ON h.habitat_id = hh.id
+                         WHERE h.id = :h_id', [':h_id' => $id])->fetchObject();
+  }
+
+  return $ham[$id];
+}

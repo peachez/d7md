@@ -1,0 +1,65 @@
+<?php
+
+function userhooks_user_load($users) {
+  foreach ($users as $uid => $user) {
+    $users[$uid]->userhooks_name = __userhooks_translate_to_pig_latin(strtolower($user->name));
+  }
+}
+
+function userhooks_user_view($account, $view_mode, $langcode) {
+  if ($view_mode == 'full' && !empty($account->userhooks_name)) {
+    $account->content['userhooks'] = [
+      '#markup' => '<dl><dt>' . t('Pig Latin Title') . ':</dt><dd> ' . $account->userhooks_title . '</dd></dl>',
+      '#weight' => 100,
+    ];
+  }
+}
+
+function userhooks_user_presave(&$edit, $account, $category) {
+  watchdog('userhooks', "I'm about to save user @user.", ['@user' => $account->name]);
+}
+
+
+function userhooks_user_insert(&$edit, $account, $category) {
+  watchdog('userhooks', "@logged_in_user created user @user.", [
+    '@logged_in_user' => $GLOBALS['user']->name,
+    '@user' => $account->name,
+  ]);
+}
+
+function userhooks_user_update(&$edit, $account, $category) {
+  watchdog('userhooks', "@logged_in_user updated user @user.", [
+    '@logged_in_user' => $GLOBALS['user']->name,
+    '@user' => $account->name,
+  ]);
+}
+
+function userhooks_user_delete($account) {
+  drupal_set_message(t('Oh! Im melting! Melting! Oh, what a world! What a world!'), 'warning');
+}
+
+function userhooks_user_login(&$edit, $account) {
+  drupal_set_message(t("Howdy, @user!", ['@user' => $account->name]));
+}
+
+function userhooks_user_logout($account) {
+  if ($account->name == 'kevin') {
+    drupal_set_message(t("Im sorry Kevin. Im afraid I cant let you do that."), 'error');
+    drupal_goto('<front>');
+  }
+}
+
+
+function __userhooks_translate_to_pig_latin($string) {
+  $words = explode(' ', $string);
+  $pig_latin = [];
+  foreach ($words as $word) {
+    if (in_array(strtolower(substr($word, 0, 1)), ['a','e','i','o','y'])) {
+      $pig_latin[] = $word . 'way';
+    }
+    else {
+      $pig_latin[] = substr($word, 1) . substr($word, 0, 1) . 'ay';
+    }
+  }
+  return implode(' ', $pig_latin);
+}

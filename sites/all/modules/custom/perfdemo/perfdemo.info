@@ -1,0 +1,6 @@
+name = Performance Demo Demo
+description = Examples of caching/performance practices when writing modules
+core = 7.x
+package = DrupalTutor
+version = 7.x-1.0
+

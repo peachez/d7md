@@ -1,0 +1,23 @@
+<?php
+
+
+function securitydemo_schema() {
+  $schema['securitydemo'] = [
+    'description' => "TODO: Please describe this table",
+    'fields' => [
+      'id' => [
+        'description' => "TODO: Please describe this field",
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'log' => [
+        'description' => "TODO: Please describe this field",
+        'type' => 'text',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}

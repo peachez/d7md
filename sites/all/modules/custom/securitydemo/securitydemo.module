@@ -1,0 +1,34 @@
+<?php
+
+function securitydemo_menu() {
+  $items = [];
+
+  $items['insecure-node/%node'] = [
+    'title callback' => 'securitydemo_node_title',
+    'title arguments' => [1],
+    'page callback' => 'securitydemo_node_body',
+    'page arguments' => [1],
+    'access arguments' => ['access content'],
+  ];
+
+  return $items;
+}
+
+function securitydemo_node_title($node) {
+  return $node->title;
+}
+
+
+function securitydemo_node_body($node) {
+  // return $node->body[LANGUAGE_NONE][0]['value'];
+
+  $body = $node->body[LANGUAGE_NONE][0]['value'];
+  // return $body . '<div>Revision Log: ' . check_plain($node->log) . '</div>';
+  // return $body . '<div>Revision Log: ' . check_markup($node->log, 'filtered_html') . '</div>';
+  return $body . '<div>Revision Log: ' . filter_xss($node->log) . '</div>';
+}
+
+function securitydemo_node_presave($node) {
+  // db_query("INSERT INTO {securitydemo} (log) VALUES ('Node Saved: " . $node->title . "')");
+  db_query("INSERT INTO {securitydemo} (log) VALUES (:msg)", [':msg' => "Node Saved: " . $node->title]);
+}

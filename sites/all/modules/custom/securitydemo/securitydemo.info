@@ -1,0 +1,6 @@
+name = Security Demo
+description = Examples of bad/good security practice when writing modules
+core = 7.x
+package = DrupalTutor
+version = 7.x-1.0
+

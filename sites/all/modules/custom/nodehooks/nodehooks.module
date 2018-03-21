@@ -1,0 +1,71 @@
+<?php
+
+function nodehooks_node_load($nodes, $types) {
+  if (in_array('article', $types)) {
+    foreach ($nodes as $nid => $node) {
+      $nodes[$nid]->nodehooks_title = ucfirst(__nodehooks_translate_to_pig_latin(strtolower($node->title)));
+    }
+  }
+}
+
+function nodehooks_node_view($node, $view_mode, $langcode) {
+  if ($view_mode == 'full' && !empty($node->nodehooks_title)) {
+    $node->content['nodehooks'] = [
+      '#markup' => '<div class="nodehooks"><strong>' . t('Pig Latin Title') . ':</strong> ' . check_plain($node->nodehooks_title) . '</div>',
+      '#weight' => 100,
+    ];
+  }
+}
+
+function nodehooks_node_validate($node, $form, &$form_state) {
+  if (strstr(strtolower($form_state['values']['title']), 'fight club')) {
+    form_set_error('title', t('The first first of Fight Club: Dont talk about Fight Club.'));
+  }
+}
+
+function nodehooks_node_submit($node, $form, &$form_state) {
+  if ($node->type == 'article') {
+    drupal_set_message(t('Your article, %title, will be reviewed by an editor soon.', ['%title' => $node->title]), 'warning');
+  }
+}
+
+function nodehooks_node_presave($node) {
+  $node->body[LANGUAGE_NONE][0]['value'] = str_replace('Voldemort', 'He who must not be named', $node->body[LANGUAGE_NONE][0]['value']);
+}
+
+function nodehooks_node_insert($node) {
+  if ($node->type == 'article') {
+    watchdog('nodehooks', 'Article %title created by !user.', [
+      '%title' => $node->title,
+      '!user' => l($node->name, 'user/' . $node->uid),
+    ]);
+  }
+}
+
+function nodehooks_node_update($node) {
+  if ($node->type == 'article') {
+    watchdog('nodehooks', 'Article %title updated.', ['%title' => $node->title]);
+  }
+}
+
+function nodehooks_node_delete($node) {
+  if ($node->type == 'article') {
+    drupal_set_messge(t('Ouch! That hurts.'), 'warning');
+  }
+}
+
+
+
+function __nodehooks_translate_to_pig_latin($string) {
+  $words = explode(' ', $string);
+  $pig_latin = [];
+  foreach ($words as $word) {
+    if (in_array(strtolower(substr($word, 0, 1)), ['a','e','i','o','y'])) {
+      $pig_latin[] = $word . 'way';
+    }
+    else {
+      $pig_latin[] = substr($word, 1) . substr($word, 0, 1) . 'ay';
+    }
+  }
+  return implode(' ', $pig_latin);
+}

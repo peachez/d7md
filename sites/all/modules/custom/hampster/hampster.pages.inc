@@ -164,6 +164,8 @@ function hampster_edit_form_submit($form, &$form_state) {
     drupal_set_message(t('Hampster %name created', ['%name' => $hampster['name']]));
   }
 
+  cache_clear_all('perfdemo:ham:list', 'cache');
+
   $form_state['redirect'] = 'hampsters/' . $hampster['id'];
 }
 
